@@ -22,7 +22,10 @@ var start = Date.now()
 function logtime(str) {
     if(outfilename) {
         var elapsed = (Date.now() - start) / 1000
-        console.log(`${elapsed} ${str}`)
+        var mem = Object.entries(process.memoryUsage())
+          .filter((entry) => ['rss','heapTotal','heapUsed'].includes(entry[0]))
+          .map((entry) => [entry[0], Math.floor(entry[1]/1024/1024)].join(':'))
+        console.log(`${elapsed} ${str} (MEM ${mem.join(' ')})`)
     }
 }
 
