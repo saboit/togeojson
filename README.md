@@ -15,6 +15,8 @@ to [GeoJSON](http://www.geojson.org/), in a browser or with [Node.js](http://nod
 
 Want to use this with [Leaflet](http://leafletjs.com/)? Try [leaflet-omnivore](https://github.com/mapbox/leaflet-omnivore)!
 
+Hacked by [SABO IT](https://www.saboit.de/) to not crash on very large KMLs (>0.5GB). [List of hacks](./KMLHACKS.md)
+
 ## API
 
 ### `toGeoJSON.kml(doc)`

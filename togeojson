@@ -7,22 +7,54 @@ var tj = require('./'),
     xmldom = new (require('xmldom').DOMParser)();
 
 var filename = argv._[0] || '',
-    filetype = (argv.f || 'kml');
+    filetype = (argv.f || 'kml'),
+    stringifyspaces = argv.s || 0,
+    outfilename = argv.o;
 
 if (filename.match(/\.kml$/i)) filetype = 'kml';
 if (filename.match(/\.gpx$/i)) filetype = 'gpx';
 
-if (!tj[filetype] || (process.stdin.isTTY && !argv._[0])) {
+var converter = tj[filetype]
+if (!converter || (process.stdin.isTTY && !argv._[0])) {
     return help();
+}
+var start = Date.now()
+function logtime(str) {
+    if(outfilename) {
+        var elapsed = (Date.now() - start) / 1000
+        console.log(`${elapsed} ${str}`)
+    }
 }
 
 (argv._.length ? fs.createReadStream(argv._[0]) : process.stdin).pipe(concat(convert));
 
-function convert(data) { process.stdout.write(
-    JSON.stringify(tj[filetype](xmldom.parseFromString(data.toString())), null, 4));
+function convert(instream) {
+    var instr = instream.toString();
+    logtime(`Input XML string ${instr.length} bytes, will parse to DOM`);
+    var indom = xmldom.parseFromString(instr);
+    logtime(`Did parse DOM, now converting to GeoJSON`);
+    var outjson = converter(indom)
+    var featureCount = outjson.features.length
+    logtime(`Will write ${featureCount} GeoJSON features to ${outfilename}`);
+    var writeDestination = outfilename ? fs.createWriteStream(outfilename) : process.stdout;
+    writeDestination.write('{"type":"FeatureCollection","features":[');
+    outjson.features.forEach((featureobj, index) => {
+        writeDestination.write(JSON.stringify(featureobj, null, stringifyspaces));
+        if(index+1 < featureCount) {
+            writeDestination.write(",");
+        }
+        if(stringifyspaces > 0) {
+          writeDestination.write("\n");
+        }
+    });
+    writeDestination.write("]}");
+    writeDestination.end();
+    logtime('GeoJSON written');
 }
 
 function help() {
-    console.error('Usage: togeojson [-f format] FILE\n' +
-        '-f    file format. if not given, will be detected by filename');
+    console.error('Usage: togeojson [-f format] [-s number] [-o outfile] INFILE\n' +
+        '-f    file format. If not given, will be detected by filename\n' +
+        '-s    number of identation spaces. Default value is 0\n' +
+        '-o    output filename. if not given, stdout will be used and no progress reporting');
 }
