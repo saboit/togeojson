@@ -7,17 +7,11 @@
     "test": "test"
   },
   "scripts": {
-    "test": "eslint togeojson.js && tape test/*.js",
-    "cov": "istanbul cover test/index.js && coveralls < ./coverage/lcov.info",
-    "browser": "browserify -t brfs test/index.js > test/bundle.js"
+    "test": "eslint togeojson.js && tape test/*.js"
   },
   "devDependencies": {
-    "brfs": "~1.4.3",
-    "coveralls": "~2.11.12",
-    "cz-conventional-changelog": "^1.2.0",
-    "eslint": "^3.3.0",
+    "eslint": "^8.10.0",
     "glob": "^7.0.5",
-    "istanbul": "~0.4.4",
     "tape": "~4.6.0"
   },
   "bin": {
@@ -37,9 +31,9 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "xmldom": "~0.6.0",
-    "concat-stream": "~1.5.1",
-    "minimist": "1.2.0"
+    "@xmldom/xmldom": "0.8.1",
+    "concat-stream": "2.0.0",
+    "minimist": "1.2.5"
   },
   "keywords": [
     "kml",
@@ -51,10 +45,5 @@
     "input",
     "leaflet",
     "maps"
-  ],
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  }
+  ]
 }
